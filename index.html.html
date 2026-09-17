@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2564cf" />
+  <title>Minhas Tarefas</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #2564cf;
+      --primary-dark: #1d4fa8;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #242424;
+      --muted: #737373;
+      --border: #e5e7eb;
+      --danger: #dc3545;
+      --success: #107c10;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+    }
+
+    .app {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Cabeçalho */
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 22px 18px;
+    }
+
+    .header-content {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header h1 {
+      font-size: 1.6rem;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* Conteúdo */
+    .main {
+      flex: 1;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    /* Campo de adicionar */
+    .add-task {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .task-input {
+      flex: 1;
+      min-width: 0;
+      height: 52px;
+      padding: 0 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      background: var(--card);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .task-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 100, 207, 0.15);
+    }
+
+    .add-button {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      background: var(--primary);
+      color: white;
+      font-size: 1.7rem;
+      line-height: 1;
+      transition: 0.2s;
+    }
+
+    .add-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .add-button:active {
+      transform: scale(0.95);
+    }
+
+    /* Filtros */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .task-count {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .clear-button {
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: var(--danger);
+      background: transparent;
+    }
+
+    .clear-button:hover {
+      background: #fff0f1;
+    }
+
+    /* Lista */
+    .task-list {
+      display: grid;
+      gap: 10px;
+      list-style: none;
+    }
+
+    .task {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 66px;
+      padding: 10px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      transition: 0.2s;
+    }
+
+    .task:hover {
+      box-shadow: var(--shadow);
+    }
+
+    /* Botão de concluir */
+    .check-button {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border: 2px solid #a5a5a5;
+      border-radius: 50%;
+      background: white;
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      transition: 0.2s;
+    }
+
+    .check-button:hover {
+      border-color: var(--success);
+    }
+
+    .task.completed .check-button {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .task-text {
+      flex: 1;
+      min-width: 0;
+      font-size: 1rem;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .task.completed .task-text {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    /* Botão excluir */
+    .delete-button {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.25rem;
+      display: grid;
+      place-items: center;
+      transition: 0.2s;
+    }
+
+    .delete-button:hover {
+      color: var(--danger);
+      background: #fff0f1;
+    }
+
+    /* Estado vazio */
+    .empty {
+      padding: 45px 20px;
+      text-align: center;
+      color: var(--muted);
+      background: white;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+    }
+
+    .empty-icon {
+      display: block;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    /* Desktop */
+    @media (min-width: 600px) {
+      .header {
+        padding: 28px 24px;
+      }
+
+      .header h1 {
+        font-size: 1.9rem;
+      }
+
+      .main {
+        padding: 28px 24px;
+      }
+
+      .task {
+        padding: 11px 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <header class="header">
+      <div class="header-content">
+        <h1>Minhas Tarefas</h1>
+        <p>Organize seu dia de forma simples.</p>
+      </div>
+    </header>
+
+    <main class="main">
+
+      <form class="add-task" id="taskForm">
+        <input
+          type="text"
+          id="taskInput"
+          class="task-input"
+          placeholder="Adicionar uma tarefa..."
+          autocomplete="off"
+          maxlength="200"
+          aria-label="Nova tarefa"
+        />
+
+        <button
+          type="submit"
+          class="add-button"
+          aria-label="Adicionar tarefa"
+          title="Adicionar tarefa"
+        >
+          +
+        </button>
+      </form>
+
+      <div class="toolbar">
+        <span class="task-count" id="taskCount">0 tarefas</span>
+
+        <button
+          type="button"
+          class="clear-button"
+          id="clearCompleted"
+        >
+          Limpar concluídas
+        </button>
+      </div>
+
+      <ul class="task-list" id="taskList"></ul>
+
+      <div class="empty" id="emptyState">
+        <span class="empty-icon">✓</span>
+        <strong>Nenhuma tarefa por aqui</strong>
+        <span>Adicione uma tarefa para começar.</span>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const taskForm = document.getElementById("taskForm");
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+    const taskCount = document.getElementById("taskCount");
+    const emptyState = document.getElementById("emptyState");
+    const clearCompleted = document.getElementById("clearCompleted");
+
+    let tasks = JSON.parse(localStorage.getItem("minhasTarefas")) || [];
+
+    function saveTasks() {
+      localStorage.setItem("minhasTarefas", JSON.stringify(tasks));
+    }
+
+    function updateCounter() {
+      const pending = tasks.filter(task => !task.completed).length;
+
+      if (pending === 1) {
+        taskCount.textContent = "1 tarefa pendente";
+      } else {
+        taskCount.textContent = `${pending} tarefas pendentes`;
+      }
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = "";
+
+      emptyState.style.display = tasks.length === 0 ? "block" : "none";
+
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+        li.className = "task";
+
+        if (task.completed) {
+          li.classList.add("completed");
+        }
+
+        const checkButton = document.createElement("button");
+        checkButton.className = "check-button";
+        checkButton.type = "button";
+        checkButton.setAttribute(
+          "aria-label",
+          task.completed
+            ? "Marcar como pendente"
+            : "Concluir tarefa"
+        );
+        checkButton.textContent = task.completed ? "✓" : "";
+
+        checkButton.addEventListener("click", () => {
+          toggleTask(task.id);
+        });
+
+        const text = document.createElement("span");
+        text.className = "task-text";
+        text.textContent = task.text;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete-button";
+        deleteButton.type = "button";
+        deleteButton.setAttribute("aria-label", "Excluir tarefa");
+        deleteButton.setAttribute("title", "Excluir tarefa");
+        deleteButton.textContent = "🗑";
+
+        deleteButton.addEventListener("click", () => {
+          deleteTask(task.id);
+        });
+
+        li.appendChild(checkButton);
+        li.appendChild(text);
+        li.appendChild(deleteButton);
+
+        taskList.appendChild(li);
+      });
+
+      updateCounter();
+    }
+
+    function addTask(text) {
+      const newTask = {
+        id: Date.now(),
+        text: text,
+        completed: false
+      };
+
+      tasks.unshift(newTask);
+      saveTasks();
+      renderTasks();
+    }
+
+    function toggleTask(id) {
+      tasks = tasks.map(task => {
+        if (task.id === id) {
+          return {
+            ...task,
+            completed: !task.completed
+          };
+        }
+
+        return task;
+      });
+
+      saveTasks();
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(task => task.id !== id);
+
+      saveTasks();
+      renderTasks();
+    }
+
+    taskForm.addEventListener("submit", event => {
+      event.preventDefault();
+
+      const text = taskInput.value.trim();
+
+      if (!text) {
+        taskInput.focus();
+        return;
+      }
+
+      addTask(text);
+
+      taskInput.value = "";
+      taskInput.focus();
+    });
+
+    clearCompleted.addEventListener("click", () => {
+      tasks = tasks.filter(task => !task.completed);
+
+      saveTasks();
+      renderTasks();
+    });
+
+    renderTasks();
+  </script>
+  <p style="margin: 8px 0 0; color: #9ca3af;">
+    Desenvolvido por <strong style="color: #ff00c3;">Leonardo Santos</strong>
+</p>
+</body>
+</html>
